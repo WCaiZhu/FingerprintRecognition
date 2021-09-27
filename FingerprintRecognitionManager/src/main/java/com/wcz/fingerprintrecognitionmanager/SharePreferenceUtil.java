@@ -30,13 +30,13 @@ public class SharePreferenceUtil {
     public static boolean isEnableFingerDataChange(Context context) {
         return getSharedPreferences(context).getBoolean(KEY_IS_FINGER_CHANGE_ENABLE, false);
     }
-
+    //判断指纹数据是否变化
     public static void saveFingerDataChange(Context context, Boolean value) {
         SharedPreferences.Editor editor = getSharedPreferences(context).edit();
         editor.putBoolean(KEY_IS_FINGER_CHANGE, value);
         editor.apply();
     }
-
+    //判断指纹数据是否变化
     public static boolean isFingerDataChange(Context context) {
         return getSharedPreferences(context).getBoolean(KEY_IS_FINGER_CHANGE, false);
     }

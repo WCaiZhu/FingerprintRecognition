@@ -25,49 +25,8 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                check();
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    switch (FingerManager.checkSupport(MainActivity.this)) {
-                        case DEVICE_UNSUPPORTED:
-                            showToast("您的设备不支持指纹");
-                            break;
-                        case SUPPORT_WITHOUT_KEYGUARD:
-                            //设备支持但未处于安全保护中（你的设备必须是使用屏幕锁保护的，这个屏幕锁可以是password，PIN或者图案都行）
-                            showOpenSettingDialog("您还未录屏幕锁保护，是否现在开启?");
-                            break;
-                        case SUPPORT_WITHOUT_DATA:
-                            showOpenSettingDialog("您还未录入指纹信息，是否现在录入?");
-                            break;
-                        case SUPPORT:
-                            FingerManager.build().setApplication(getApplication())
-                                    .setTitle("指纹验证")
-                                    .setDes("请按下指纹")
-                                    .setNegativeText("取消")
-                                    //                                    .setFingerDialogApi23(new MyFingerDialog())//如果你需要自定义android P 以下系统弹窗就设置,注意需要继承BaseFingerDialog，不设置会使用默认弹窗
-                                    .setFingerCallback(new SimpleFingerCallback() {
-                                        @Override
-                                        public void onSucceed() {
-                                            showToast("验证成功");
-                                        }
-
-                                        @Override
-                                        public void onFailed() {
-                                            showToast("指纹无法识别");
-                                        }
-
-                                        @Override
-                                        public void onChange() {
-                                            showToast("指纹数据发生了变化");
-                                        }
-
-
-                                    })
-                                    .create()
-                                    .startListener(MainActivity.this);
-                            break;
-                        default:
-                    }
-                }
             }
         });
 
@@ -93,6 +52,57 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    /**
+     * 验证指纹
+     */
+    private void check() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            switch (FingerManager.checkSupport(MainActivity.this)) {
+                case DEVICE_UNSUPPORTED:
+                    showToast("您的设备不支持指纹");
+                    break;
+                case SUPPORT_WITHOUT_KEYGUARD:
+                    //设备支持但未处于安全保护中（你的设备必须是使用屏幕锁保护的，这个屏幕锁可以是password，PIN或者图案都行）
+                    showOpenSettingDialog("您还未录屏幕锁保护，是否现在开启?");
+                    break;
+                case SUPPORT_WITHOUT_DATA:
+                    showOpenSettingDialog("您还未录入指纹信息，是否现在录入?");
+                    break;
+                case SUPPORT:
+                    FingerManager.build().setApplication(getApplication())
+                            .setTitle("指纹验证")
+                            .setDes("请按下指纹")
+                            .setNegativeText("取消")
+                            //                                    .setFingerDialogApi23(new MyFingerDialog())//如果你需要自定义android P 以下系统弹窗就设置,注意需要继承BaseFingerDialog，不设置会使用默认弹窗
+                            .setFingerCallback(new SimpleFingerCallback() {
+                                @Override
+                                public void onSucceed() {
+
+                                    showToast("验证成功");
+
+                                }
+
+                                @Override
+                                public void onFailed() {
+                                    showToast("指纹无法识别");
+                                }
+
+                                @Override
+                                public void onChange() {
+                                    FingerManager.updateFingerData(MainActivity.this);
+                                    check();
+                                }
+
+
+                            })
+                            .create()
+                            .startListener(MainActivity.this);
+                    break;
+                default:
+            }
+        }
     }
 
     private void showToast(String content) {
@@ -128,5 +138,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         openFingerprintTipDialog.show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 }

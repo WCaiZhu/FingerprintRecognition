@@ -19,7 +19,7 @@ import com.wcz.fingerprintrecognitionmanager.interfaces.IFingerCallback;
 import javax.crypto.Cipher;
 
 /**
- * Android 9.0及以上的指纹认证实现
+ * Android 9.0及以上的指纹认证实现，相比Android 6.0 指纹识别框可以自定义，而9.0不允许开发者自定义指纹识别框
  */
 @RequiresApi(Build.VERSION_CODES.P)
 public class BiometricPromptImpl28 implements IBiometricPrompt {
@@ -27,8 +27,13 @@ public class BiometricPromptImpl28 implements IBiometricPrompt {
     private AppCompatActivity mActivity;
     private CancellationSignal mCancellationSignal;
     private boolean mSelfCanceled;//用户主动取消指纹识别
+
+    /**
+     * 此类为加密和解密提供密码功能
+     */
     private Cipher cipher;
     private IFingerCallback mFingerCallback;
+
     private BiometricPrompt mBiometricPrompt;
     private static final String SECRET_MESSAGE = "Very secret message";
 
@@ -37,7 +42,7 @@ public class BiometricPromptImpl28 implements IBiometricPrompt {
         this.mActivity = activity;
         this.cipher = CipherHelper.getInstance().createCipher();
         this.mFingerCallback = fingerManagerController.getFingerCallback();
-        //Android 9.0及以下显示系统的指纹认证对话框
+        //Android 9.0及以上显示系统的指纹认证对话框
         this.mBiometricPrompt = new BiometricPrompt
                 .Builder(activity)
                 .setTitle(fingerManagerController.getTitle())
@@ -106,6 +111,7 @@ public class BiometricPromptImpl28 implements IBiometricPrompt {
                                  */
                                 //针对三星手机，开启了监听才去检测设备指纹库变化
                                 if (SharePreferenceUtil.isEnableFingerDataChange(mActivity)) {
+                                    ////获取加密数据
                                     cipher.doFinal(SECRET_MESSAGE.getBytes());
                                 }
                                 cancel.cancel();

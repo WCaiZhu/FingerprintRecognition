@@ -42,6 +42,10 @@ public class FingerManagerBuilder {
         return mApplication;
     }
 
+    /**
+     * @param title 标题
+     * @return
+     */
     public FingerManagerBuilder setTitle(String title) {
         mTitle = title;
         return this;
@@ -51,6 +55,10 @@ public class FingerManagerBuilder {
         return mTitle;
     }
 
+    /**
+     * @param des 提示信息
+     * @return
+     */
     public FingerManagerBuilder setDes(String des) {
         this.mDes = des;
         return this;

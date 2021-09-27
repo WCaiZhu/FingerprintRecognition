@@ -21,6 +21,8 @@ import javax.crypto.Cipher;
 
 /**
  * Android 6.0及以上指纹认证实现
+ *
+ * 指纹识别api的简介：https://blog.csdn.net/hailong0529/article/details/95406183
  */
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class BiometricPromptImpl23 implements IBiometricPrompt {
@@ -48,7 +50,7 @@ public class BiometricPromptImpl23 implements IBiometricPrompt {
     /**
      * 开始指纹认证
      *
-     * @param cancel
+     * @param cancel  用来取消指纹扫描器的扫描操作。比如在用户点击识别框上的“取消”按钮或者“密码验证”按钮后，就要及时取消扫描器的扫描操作
      */
     @Override
     public void authenticate(@NonNull final CancellationSignal cancel) {
@@ -82,7 +84,10 @@ public class BiometricPromptImpl23 implements IBiometricPrompt {
         }
         //开始指纹认证
         FingerprintManager fingerprintManager = (FingerprintManager) mActivity.getSystemService(FingerprintManager.class);
+       //FingerprintManager.CryptoObject 指纹加密
+        // flags 可选标志，暂无用处，传 0 即可。只用于 Android 6.0
         fingerprintManager.authenticate(new FingerprintManager.CryptoObject(mCipher), cancel, 0,
+                //指纹识别结果的回调接口
                 new FingerprintManager.AuthenticationCallback() {
 
                     @Override
@@ -118,6 +123,7 @@ public class BiometricPromptImpl23 implements IBiometricPrompt {
                                  */
                                 //针对三星手机，开启了监听才去检测设备指纹库变化
                                 if (SharePreferenceUtil.isEnableFingerDataChange(mActivity)) {
+                                    //获取加密数据
                                     cipher.doFinal(SECRET_MESSAGE.getBytes());
                                 }
 
@@ -145,6 +151,8 @@ public class BiometricPromptImpl23 implements IBiometricPrompt {
                         mFingerCallback.onFailed();
                     }
                 }, null);
+        //Handler handler这个参数用于 Android 6.0，是 @Nullable 的，作用是告诉系统使用这个 Handler
+        // 的 Looper 处理指纹识别的 Message。默认就是交给主线程的 Looper 处理，传 null 即可
 
     }
 }

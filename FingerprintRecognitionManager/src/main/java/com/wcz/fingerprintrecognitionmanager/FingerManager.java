@@ -27,6 +27,10 @@ public class FingerManager {
 
     private static FingerManagerBuilder mFingerManagerBuilder;
 
+    /**
+     * 这个对象的作用是用来取消指纹扫描器的扫描操作。比如在用户点击识别框上的“取消”按钮或者“密码验证”按钮后，就要及时取消扫描器的扫描操作。
+     * 不及时取消的话，指纹扫描器就会一直扫描，直至超时
+     */
     private CancellationSignal cancellationSignal;
 
     private IBiometricPrompt biometricPrompt;
@@ -60,17 +64,22 @@ public class FingerManager {
      * @return
      */
     public static SupportResult checkSupport(Context context) {
+       //指纹系统服务
         FingerprintManager fingerprintManager = context.getSystemService(FingerprintManager.class);
+        //判断硬件是否支持指纹
         if (!fingerprintManager.isHardwareDetected()) {
             return SupportResult.DEVICE_UNSUPPORTED;
         }
         KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+        //判断是否处于安全保护中（你的设备必须是使用屏幕锁保护的，这个屏幕锁可以是password，PIN或者图案都行）  判断 是否开启锁屏密码
         if (!keyguardManager.isKeyguardSecure()) {
             return SupportResult.SUPPORT_WITHOUT_KEYGUARD;
         }
+        //设备支持且有指纹数据
         if (fingerprintManager.hasEnrolledFingerprints()) {
             return SupportResult.SUPPORT;
         }
+        //设备支持指纹识别但是没有指纹数据
         return SupportResult.SUPPORT_WITHOUT_DATA;
 
     }
@@ -85,8 +94,10 @@ public class FingerManager {
 
     private void createImpl(AppCompatActivity activity, BaseFingerDialog fingerDialog) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            //如果为9.0以上则使用9.0的api
             biometricPrompt = new BiometricPromptImpl28(activity, mFingerManagerBuilder);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            //如果为6.0以上则使用6.0的api
             biometricPrompt = new BiometricPromptImpl23(activity, fingerDialog, mFingerManagerBuilder);
         }
     }
@@ -106,6 +117,7 @@ public class FingerManager {
         }
 
         if (cancellationSignal.isCanceled()) {
+            //取消扫描，每次取消后需要重新创建新示例
             cancellationSignal = new CancellationSignal();
         }
         //开始指纹认证
