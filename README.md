@@ -1,17 +1,16 @@
 # FingerprintRecognition
 有关指纹识别的工具包，适配6.0和9.0以上的安卓设备
 
+
 Android studio中调用
 
-implementation "io.github.WCaiZhu:FingerprintRecognitionManager:1.0.0"
+	implementation "io.github.WCaiZhu:FingerprintRecognitionManager:1.0.0"
 
 
 方法调用：
-/**
-* 验证指纹
-*/
-private void check() {
-   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+```
+	private void check() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
        switch (FingerManager.checkSupport(MainActivity.this)) {
           case DEVICE_UNSUPPORTED:
                showToast("您的设备不支持指纹");
@@ -54,27 +53,25 @@ private void check() {
             }
         }
     }
-
+```
 引导录入指纹：
-/**
-* 引导指纹录入
-*/
-public void startFingerprint() {
-   final String BRAND = android.os.Build.BRAND;
-   Log.d(TAG, "BRAND:" + BRAND);
-   PhoneInfoCheck.getInstance(this, BRAND).startFingerprint();
-}
-
+```
+   	   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    FingerManager.updateFingerData(MainActivity.this);
+                    showToast("已同步指纹数据,解除指纹数据变化");
+                }
+```
 
 同步指纹数据，当有增加或减少指纹时，要进行同步
+```
 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
      FingerManager.updateFingerData(MainActivity.this);
     showToast("已同步指纹数据,解除指纹数据变化");
 }
-
+```
 
 判断指纹是否发生变化
-
+```
 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
     if (FingerManager.hasFingerprintChang(MainActivity.this)) {
          showToast("指纹数据已经发生变化");
@@ -82,3 +79,5 @@ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
          showToast("指纹数据没有发生变化");
      }
 }
+```
+
